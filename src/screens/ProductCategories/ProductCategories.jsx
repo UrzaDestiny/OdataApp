@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Button, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import Reactotron from "reactotron-react-native";
 import { XMLParser } from "fast-xml-parser";
 
 const ProductCategories = () => {
   const [catigories, setCatigories] = useState([]);
-  const [content, setContent] = useState({});
 
   const getData = async () => {
     try {
@@ -14,11 +13,8 @@ const ProductCategories = () => {
         "https://services.odata.org/V2/Northwind/Northwind.svc/Categories?$expand=Products"
       );
       let textResponse = await response.text();
-      let obj = parser.parse(textResponse);
-      await setCatigories(obj.feed.entry);
-      Reactotron.log(catigories);
-      await setContent(obj.feed.entry[0].content["m:properties"]);
-      Reactotron.log(content);
+      let responseObject = parser.parse(textResponse);
+      await setCatigories(responseObject.feed.entry);
     } catch (error) {
       Reactotron.error(error);
     }

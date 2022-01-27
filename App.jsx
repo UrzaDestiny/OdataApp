@@ -4,6 +4,7 @@ import Reactotron from "reactotron-react-native";
 import FirstScreen from "./src/screens/FirstScreen";
 import MyProfile from './src/screens/MyProfile';
 import ProductCategories from './src/screens/ProductCategories';
+import Customers from './src/screens/Customers';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ export default function App() {
         <Stack.Screen name="Home" component={FirstScreen} />
         <Stack.Screen name="MyProfile" component={MyProfile} />
         <Stack.Screen name="Product Categories" component={ProductCategories} />
+        <Stack.Screen name="Customers" component={Customers} />
       </Stack.Navigator>
     </NavigationContainer>
   );
