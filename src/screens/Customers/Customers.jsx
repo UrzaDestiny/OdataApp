@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Platform, PermissionsAndroid } from "react-native";
 import Reactotron from "reactotron-react-native";
 import { XMLParser } from "fast-xml-parser";
 import Geocoder from "react-native-geocoding";
 import Geolocation from '@react-native-community/geolocation';
 
 Geocoder.init("AIzaSyA-B1CGynFhr6DbXybc-WgRZ6TTMq02zXQ");
-
-Geocoder.from("Colosseum")
-  .then((json) => {
-    var location = json.results[0].geometry.location;
-    Reactotron.log(location);
-  })
-  .catch((error) => Reactotron.warn(error));
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
@@ -35,33 +28,40 @@ const Customers = () => {
     }
   };
 
-  Geocoder.from("Obere Str. 57, Berlin")
-    .then((json) => {
-      var location = json.results[0].geometry.location;
-    //   Reactotron.log(location);
-    })
-    .catch((error) => Reactotron.warn(error));
-
-    Geolocation.getCurrentPosition(info => Reactotron.log(info));
-
-//   Geolocation.getCurrentPosition(
-//     (position) => {
-//       const currentLongitude = JSON.stringify(position.coords.longitude);
-//       Reactotron.log(currentLongitude);
-//       const currentLatitude = JSON.stringify(position.coords.latitude);
-//       Reactotron.log(currentLatitude);
-//     },
-//     (error) => alert(error.message),
-//     {
-//       enableHighAccuracy: true,
-//       timeout: 20000,
-//       maximumAge: 1000,
-//     }
-//   );
+  const requestPermissions = async () => {
+    
+    Reactotron.log(Platform.OS);
+    if (Platform.OS === 'ios') {
+      Geolocation.requestAuthorization();
+      Geolocation.setRNConfiguration({
+        skipPermissionRequests: false,
+       authorizationLevel: 'whenInUse',
+     });
+    }
+  
+    if (Platform.OS === 'android') {
+      await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+    }
+  }
 
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    requestPermissions();
+  }, [])
+
+  Geocoder.from("Obere Str. 57, Berlin")
+  .then((json) => {
+    var location = json.results[0].geometry.location;
+    Reactotron.log(location);
+  })
+  .catch((error) => Reactotron.warn(error));
+
+  // Geolocation.getCurrentPosition(info => Reactotron.log(info));
 
   return (
     <View style={styles.container}>
