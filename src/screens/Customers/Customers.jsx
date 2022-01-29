@@ -8,7 +8,7 @@ import { getDistance } from "geolib";
 
 import { requestPermissions } from "../../helpers/permissions";
 
-Geocoder.init("AIzaSyA-B1CGynFhr6DbXybc-WgRZ6TTMq02zXQ");
+Geocoder.init("xxxxxxxxxxxxxxxxxxxx");
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
