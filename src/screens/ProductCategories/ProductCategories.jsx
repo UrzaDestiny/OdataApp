@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import Reactotron from "reactotron-react-native";
 import { XMLParser } from "fast-xml-parser";
 
 const ProductCategories = () => {
   const [catigories, setCatigories] = useState([]);
+  const [loading, setLoadingStatus] = useState(false);
 
   const getData = async () => {
+    setLoadingStatus(true);
     try {
       const parser = new XMLParser();
       const response = await fetch(
@@ -18,6 +20,7 @@ const ProductCategories = () => {
     } catch (error) {
       Reactotron.error(error);
     }
+    setLoadingStatus(false);
   };
 
   const countProductsNumber = (productsDiscription) =>
@@ -31,6 +34,7 @@ const ProductCategories = () => {
 
   return (
     <View style={styles.container}>
+      <ActivityIndicator animating={loading} size="large" color="#0000ff" />
       {catigories.map((category) => (
         <View>
           <Text>{`${

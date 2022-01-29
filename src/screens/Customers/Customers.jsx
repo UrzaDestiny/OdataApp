@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import Reactotron from "reactotron-react-native";
 import { XMLParser } from "fast-xml-parser";
 import Geocoder from "react-native-geocoding";
@@ -8,13 +8,14 @@ import { getDistance } from "geolib";
 
 import { requestPermissions } from "../../helpers/permissions";
 
-Geocoder.init("xxxxxxxxxxxxxxxxxxxxxxxxxx");
+Geocoder.init("AIzaSyA-B1CGynFhr6DbXybc-WgRZ6TTMq02zXQ");
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
   const [currentPosition, setCurrentPosition] = useState({});
   const [customerLocations, setCustomersLocations] = useState([]);
   const [distances, setDistances] = useState([]);
+  const [loading, setLoadingStatus] = useState(true);
 
   const getData = async () => {
     try {
@@ -54,7 +55,7 @@ const Customers = () => {
     setCustomersLocations(res);
   };
 
-  const getDistanceToLocations = async () => {
+  const getDistanceToLocations = () => {
     let result = [];
     try {
       for (let customerLocation of customerLocations) {
@@ -75,6 +76,7 @@ const Customers = () => {
       Reactotron.error(error);
     }
     setDistances(result);
+    setLoadingStatus(false);
   };
 
   useEffect(() => {
@@ -86,34 +88,55 @@ const Customers = () => {
       (position) => {
         setCurrentPosition(position.coords);
       },
-      () => {
+      (error) => {
         alert("Position could not be determined.");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
       }
     );
   }, []);
 
   useEffect(() => {
     getData();
-    getCustomersLocations();
-    getDistanceToLocations();
   }, []);
+
+  useEffect(() => {
+    if (customers.length > 0) {
+      getCustomersLocations();
+    }
+  }, [customers]);
+
+  useEffect(() => {
+    if (customerLocations.length > 0) {
+      getDistanceToLocations();
+    }
+  }, [customerLocations]);
 
   return (
     <View style={styles.container}>
-      <View>
-        {customers.map((customer) => (
+      {loading ? (
+        <ActivityIndicator animating={true} size="large" color="#0000ff" />
+      ) : (
+        <View style={styles.container}>
           <View>
-            <Text>{`${customer["d:CustomerID"]}`}</Text>
+            {customers.map((customer) => (
+              <View>
+                <Text>{`${customer["d:CustomerID"]}`}</Text>
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
-      <View>
-        {distances.map((distance) => (
           <View>
-            <Text>{`${distance / 1000} km`}</Text>
+            {distances.map((distance) => (
+              <View>
+                <Text>{`${distance / 1000} km`}</Text>
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
+        </View>
+      )}
     </View>
   );
 };
